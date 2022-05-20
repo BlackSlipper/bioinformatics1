@@ -2,12 +2,14 @@
 setRepositories(ind=1:7)
 library(data.table)
 library(DescTools)
+
 #Load Data
-setwd("C:/Users/Hanshin/Downloads/")
-pileup <- fread("pileup.csv")
-let7d_gene <- fread("let7d_pileup.csv")
-let7g_gene <- fread("let7g_pileup.csv")
-let7f_1_gene <- fread("let7f_1_pileup.csv")
+setwd("C:/Users/User/Downloads/")
+let7d_gene <- read.csv("let7d_pileup.csv")
+let7g_gene <- read.csv("let7g_pileup.csv")
+let7f_1_gene <- read.csv("let7f_1_pileup.csv")
+
+
 #Reconstruct Data
 data1 <- let7d_gene[,c(1,2,7)]
 data2 <- let7g_gene[,c(1,2,7)]
@@ -73,6 +75,7 @@ colnames(bedgraph_let7g) <- c('chrom','chromStart','chromEnd','dataValue')
 bedgraph_let7f_1 <- data3[,c(1,2,2,5)]
 colnames(bedgraph_let7f_1) <- c('chrom','chromStart','chromEnd','dataValue')
 
-write.csv(bedgraph_let7d, 'bedgraph_let7d.csv')
-write.csv(bedgraph_let7g, 'bedgraph_let7g.csv')
-write.csv(bedgraph_let7f_1, 'bedgraph_let7f_1.csv')
+write.table(bedgraph_let7d, 'bedgraph_let7d.csv', quote = F, sep =" ", row.names = F)
+write.table(bedgraph_let7g, 'bedgraph_let7g.csv',quote = F, sep =" ", row.names = F)
+write.table(bedgraph_let7f_1, 'bedgraph_let7f_1.csv', quote = F, sep =" ", row.names = F)
+
