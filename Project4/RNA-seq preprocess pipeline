@@ -1,0 +1,174 @@
+setRepositories(ind=1:8)
+library(doParallel)
+library(foreach)
+library(dplyr)
+library(Hmisc)
+library(tidyverse)
+library(parallel)
+library(stringr)
+
+# #Parallel Setting
+# 
+# numCores <- (parallel::detectCores()/2)
+# myCluster <- makeCluster(numCores)
+# doParallel::registerDoParallel(myCluster)
+
+#Input directory
+args <- commandArgs(trailingOnly = T)
+
+idxRNA_seq_directory <- which(args == "-RNA_Directory")
+
+idxTrimmomatic_directory <-which(args =="-Trimmomatic")
+idxFastQC_directory <- which(args=="-fastqc")
+idxHISAT2_directory <- which(args=="-hisat2")
+idxSamtools_directory <- which(args=="-Samtools")
+idxfeatureCounts_directory <- which(args=="-featureCounts")
+idxInput_fastqgz_directory <- which(args =="-inputfq")
+
+RNA_seq_directory <- args[idxRNA_seq_directory+1]
+Trimmomatic_directory <- args[idxTrimmomatic_directory + 1]
+FastQC_directory <- args[idxFastQC_directory +1]
+HISAT2_directory <- args[idxHISAT2_directory +1]
+Samtools_directory <- args[idxSamtools_directory +1]
+featureCounts_directory <- args[idxfeatureCounts_directory +1]
+Input_fastqgz_directory <- args[idxInput_fastqgz_directory +1]
+
+#Setting up Output Directory
+Directory <- c()
+Directory[1] <- paste0("mkdir ", RNA_seq_directory,"/1.Trimmomatic")
+Directory[2] <- paste0("mkdir ", RNA_seq_directory,"/2.FastQC")
+Directory[3] <- paste0("mkdir ", RNA_seq_directory,"/3.HISAT2")
+Directory[4] <- paste0("mkdir ", RNA_seq_directory,"/4.Samtools")
+Directory[5] <- paste0("mkdir ", RNA_seq_directory,"/5.featureCounts")
+
+for (a in 1:length(Directory)){
+  system(Directory[a])
+}
+
+Trimmomatic_ <-paste0(RNA_seq_directory, "1.Trimmomatic")
+FastQC_ <- paste0(RNA_seq_directory,"2.FastQC")
+HISAT2_ <- paste0(RNA_seq_directory,"3.HISAT2")
+Samtools_ <- paste0(RNA_seq_directory,"4.Samtools")
+featureCounts_ <- paste0(RNA_seq_directory,"5.featureCounts")
+
+threads = 16
+
+
+#Single End Trimmomatic
+# /program/Trimmomatic/trimmomatic-0.39.jar
+print("Start Trimmomatic")
+
+#Name extraction
+Trimmomatic_file <- list.files(path =Input_fastqgz_directory, pattern= ".fastq.gz")
+Trimmomatic_file <- list.files(path ="/disk3/biyb/project/1.Data/", pattern= ".fastq.gz")
+
+Name_1 <- strsplit(Trimmomatic_file, "[.]")
+Name_2 <- as.data.frame(Name_1)
+Name <- c()
+for(c in 1:length(Trimmomatic_file)){
+  Name[c] <- as.character(Name_2[1,c])
+}
+
+Trimmomatic_id_fastq_gz <- c()
+for (b in length(Trimmomatic_file)){
+  Trimmomatic_id_fastq_gz[b] <- paste0(Trimmomatic_file[b],".fastq.gz")
+}
+Trim <- c()
+a<- c()
+a[1] <- paste0("1")
+a[2] <- paste0("2")
+a[3] <- paste0("3")
+a[4] <- paste0("4")
+a[5] <- paste0("5")
+a[6] <- paste0("6")
+a[7] <- paste0("7")
+a[8] <- paste0("8")
+a[9] <- paste0("9")
+a[10] <- paste0("10")
+a[11] <- paste0("11")
+a[12] <- paste0("12")
+Trim <-c()
+for (c in 1:length(Trimmomatic_file)){
+  Trim[c] <-paste0("java -jar ",Trimmomatic_directory," SE -threads ","2 ", Input_fastqgz_directory, "/", Trimmomatic_file[c]," ",Trimmomatic_, "/",Name[c],".fastq.gz", " ILLUMINACLIP:/program/Trimmomatic/adapters/TruSeq3-SE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:36 >2 ", Trimmomatic_,"/", Name[c],".log")
+  system(Trim[c])
+}
+print("Finish Trimmomatic")
+print("Start FastQC")
+
+### FastQC #####
+# /program/FastQC/fastqc
+
+FastQC_file <- list.files(path =Trimmomatic_, pattern= "TrimmomaticOut")
+
+FastQC_file_split <- strsplit(FastQC_file,"[.]")
+FastQC_id_unlist <- as.data.frame(FastQC_file_split)
+FastQC_id <- c()
+FastQC_id_ <- c()
+for(c in 1:length(FastQC_file)){
+ FastQC_id[c] <- as.character(FastQC_id_unlist[1,c])
+ FastQC_id_[c] <-  paste0(FastQC_id[c],".fastq")
+}
+QualityControl <- c()
+for (d in 1:length(FastQC_file)){
+ QualityControl[d] <-paste0(FastQC_directory," -o ", FastQC_," ",Trimmomatic_,"/",FastQC_id_[d]," &")
+ system(QualityControl[d])
+}
+#
+# print("Finish FastQC")
+# #####HISAT2##AND##SAMTOOLS#
+#hisat2-build genome.fa genome
+#####HISAT2##AND##SAMTOOLS#
+#hisat2-build genome.fa genome
+
+# print("Start Hisat2 & Samtools")
+
+Hisat2_file <- list.files(path = Trimmomatic_, pattern = "fastq")
+#Hisat2_file <- list.files(path = "/disk11/bishs/TestRNApipeline/1.Trimmomatic/", pattern = "fastq.gz")
+
+Hisat2_id_split <- strsplit(Hisat2_file,"[.]")
+Hisat2_id_unlist <- as.data.frame(Hisat2_id_split)
+Hisat2_id <- c()
+Hisat2_id_ <- c()
+
+for(c in 1:length(Hisat2_file)){
+  Hisat2_id[c] <- as.character(Hisat2_id_unlist[1,c])
+  Hisat2_id_[c] <-  paste0(Hisat2_id[c],".fastq")
+}
+
+Mapping <- c()
+for (e in 1:length(Hisat2_file)){
+  Mapping[e] <- paste0(HISAT2_directory," -p ", threads, " -x /disk11/bishs/Human ","-U ", Trimmomatic_,"/", Hisat2_id_[e], " 2> ",HISAT2_,"/",Hisat2_id[e], ".log | ",Samtools_directory, " sort -@ ", threads, " -o ", Samtools_,"/",Hisat2_id_[e],".sorted.bam") #%>% system()
+  print(Mapping[e])
+  system(Mapping[e])
+}
+
+  #system(Mapping[e]) -a
+
+# HISAT2_directory = "/program/HISAT2/hisat2"
+# Trimmomatic_ = "/disk11/bishs/TestRNApipeline/1.Trimmomatic"
+# Samtools_directory = "/program/samtools/bin/samtools"
+
+#"/program/HISAT2/hisat2 -p 16 -x /disk11/bishs/Human -U /disk11/bishs/TestRNApipeline/1.Trimmomatic/TrimmomaticOut1.fastq.gz 2> TrimmomaticOut1.log | /program/samtools/bin/samtools sort -@ 16 -o 4.Samtools/TrimmomaticOut1.sorted.bam"
+print("Finish Hisat2 & Samtools")
+
+##############Feature Counts############
+print("Start featureCounts")
+featureCounts_file <- list.files(path = Samtools_, pattern = "sorted.bam")
+featureCounts_file <- list.files(path = "/disk8/bishs/TestRNApipeline/4.Samtools/", pattern = "sorted.bam")
+featureCounts_id_split <- strsplit(featureCounts_file,"[.]")
+featureCounts_id_unlist <- as.data.frame(featureCounts_id_split)
+featureCounts_id <- c()
+featureCounts_id_ <- c()
+
+for(c in 1:length(featureCounts_file)){
+  featureCounts_id[c] <- as.character(featureCounts_id_unlist[1,c])
+  featureCounts_id_[c] <-  paste0(featureCounts_id[c])
+}  
+
+Counting <- c()
+for (f in 1:length(featureCounts_file)){
+  Counting[f] <- paste0(featureCounts_directory, " -T ", 2, " -a /disk11/bishs/Homo_sapiens.GRCh38.104.gtf.gz ", "-o ", featureCounts_,"/",featureCounts_id[f], "counts.txt ", Samtools_,"/", featureCounts_file[f]," &")
+  print(Counting[f])
+  system(Counting[f])
+}
+print("Finish featureCounts")
