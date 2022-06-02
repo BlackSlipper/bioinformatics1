@@ -211,5 +211,16 @@ MDS_data <- plotMDS(Y_LEC,top=20000)
 head(MDS_data)
 plot_data <- data.frame(Condition = LEC, X=MDS_data$x, Y=MDS_data$y)
 head(plot_data)
+#####################Volcano plot #########################
+plot(x= Result_LEC_table$logFC,
+     y = -log10(Result_LEC_table$PValue),
+     main = "Volcano Plot",
+     xlab = "logFoldChange",
+     ylab = "logP-Value",
+     type ="p",
+     col =adjustcolor("black", alpha=0.3),
+     pch=1)
 
-
+print(sum(Result_table$PValue < 0.01))
+print(sum(Result_table$logFC < -3))
+print(sum((-log10(Result_LEC_table$PValue)>2)& (Result_table$logFC > 3)))
