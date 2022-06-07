@@ -7,4 +7,4 @@ Mission3 = CoLab_TermProj_2022_3.ipynb + Mission3__Rcode.R + let7d.pdf, let7f.pd
 
 자유 프로젝트
 
-Week1 = Project4.ipynb
+Project4 folder
