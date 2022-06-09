@@ -9,8 +9,9 @@ Week1 :
 
 Week2: 
 1. Raw data, TPM, TMM의 상관관계를 plotting
-2. EdgeR를 이용하여 Differential Expressed Gene분석
-3. 
+2. EdgeR를 이용하여 LEC(Lymphatic Epithelial Cell)과 vIRF3-overexpressed LEC 사이의 Differential Expressed Gene분석
+3. Volcano plot을 plotting
 
-Week3 계획:
-1. Gene Set Enrichment Analysis를 진행할 예정입니다.
+Week3:
+1. g:Profiler를 이용하여 logFC>4 & FDR<0.05인 DEG들에 대해 Gene Set Enrichment Analysis
+2. Gene set enrichment analysis 결과 이해하기
